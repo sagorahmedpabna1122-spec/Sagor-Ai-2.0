@@ -7,147 +7,190 @@ import Parser from "rss-parser";
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+const parser = new Parser();
+
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: "12mb" }));
 
-const parser = new Parser();
+const API_KEY = process.env.OPENROUTER_API_KEY;
+const MODEL = process.env.OPENROUTER_MODEL || "openrouter/free";
 
-const key = process.env.GEMINI_API_KEY;
-const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
-async function ai(input, instructions) {
-  if (!key) {
-    throw new Error("Server-এ GEMINI_API_KEY configure করা হয়নি");
+async function ai(input, instructions = "তুমি SAGOR AI। স্বাভাবিক, সহজ ও সুন্দর বাংলায় উত্তর দাও।") {
+  if (!API_KEY) {
+    throw new Error("OPENROUTER_API_KEY সেট করা নেই।");
   }
 
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: instructions }]
+  const response = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://sagor-ai.onrender.com",
+        "X-OpenRouter-Title": "SAGOR AI"
       },
-      contents: [{
-        role: "user",
-        parts: [{ text: input }]
-      }],
-      generationConfig: {
-        temperature: 0.8,
-        maxOutputTokens: 8192
-      }
-    })
-  });
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: "system", content: instructions },
+          { role: "user", content: input }
+        ],
+        temperature: 0.7
+      })
+    }
+  );
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error?.message || "Gemini API Error");
+    throw new Error(
+      data?.error?.message || `OpenRouter Error: ${response.status}`
+    );
   }
 
-  return (data.candidates?.[0]?.content?.parts || [])
-    .map(part => part.text || "")
-    .join("\n");
+  const answer = data?.choices?.[0]?.message?.content;
+
+  if (!answer) {
+    throw new Error("AI কোনো উত্তর দেয়নি।");
+  }
+
+  return typeof answer === "string"
+    ? answer
+    : JSON.stringify(answer);
 }
 
-app.get("/api/health", (_q, s) => {
-  s.json({
-    ok: true,
-    name: "SAGOR AI",
-    provider: "Google Gemini",
-    model
+// Backend Status
+app.get("/", (req, res) => {
+  res.send("SAGOR AI Backend is running!");
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "online",
+    provider: "OpenRouter",
+    model: MODEL,
+    keyConfigured: Boolean(API_KEY)
   });
 });
 
-app.post("/api/chat", async (q, s) => {
+// AI Chat
+app.post("/api/chat", async (req, res) => {
   try {
-    const answer = await ai(
-      String(q.body.message || "").slice(0, 12000),
-      "তুমি SAGOR AI, বাংলাদেশের ব্যক্তিগত বাংলা AI সহকারী। স্বাভাবিক বাংলাদেশি বাংলায় উত্তর দাও। প্রশ্ন বুঝে বিস্তারিত ও নির্ভুল উত্তর দাও।"
-    );
+    const message = req.body.message || req.body.prompt;
 
-    s.json({ answer });
-  } catch (e) {
-    s.status(500).json({ error: e.message });
-  }
-});
-
-app.post("/api/story", async (q, s) => {
-  try {
-    const story = await ai(
-      String(q.body.topic || "").slice(0, 12000),
-      "তুমি একজন দক্ষ বাংলা গল্পকার। বাংলাদেশের দর্শকদের উপযোগী মৌলিক, আবেগঘন, রোমান্টিক ও সিনেমাটিক বাংলা গল্প লেখো।"
-    );
-
-    s.json({ story });
-  } catch (e) {
-    s.status(500).json({ error: e.message });
-  }
-});
-
-app.post("/api/youtube-seo", async (q, s) => {
-  try {
-    const result = await ai(
-      String(q.body.topic || "").slice(0, 12000),
-      "তুমি একজন অভিজ্ঞ YouTube SEO বিশেষজ্ঞ। বাংলা লাভ স্টোরি চ্যানেলের জন্য SEO Title, Description, Hashtags এবং সর্বোচ্চ 500 characters-এর English tags তৈরি করো। বাংলা লাভ স্টোরি শব্দটি বাংলায় রাখবে।"
-    );
-
-    s.json({ result });
-  } catch (e) {
-    s.status(500).json({ error: e.message });
-  }
-});
-
-app.get("/api/news", async (_q, s) => {
-  const urls = [
-    "https://feeds.bbci.co.uk/news/world/rss.xml",
-    "https://www.aljazeera.com/xml/rss/all.xml"
-  ];
-
-  const items = [];
-
-  for (const url of urls) {
-    try {
-      const feed = await parser.parseURL(url);
-
-      items.push(
-        ...(feed.items || []).slice(0, 15).map(item => ({
-          title: item.title,
-          link: item.link,
-          date: item.isoDate || item.pubDate,
-          source: feed.title
-        }))
-      );
-    } catch (e) {
-      console.log("News feed error:", e.message);
+    if (!message) {
+      return res.status(400).json({ error: "প্রশ্ন লিখুন।" });
     }
+
+    const reply = await ai(message);
+
+    res.json({
+      reply,
+      answer: reply,
+      success: true
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
-
-  s.json({ items });
 });
 
-// Image generation needs a separate supported image service.
-app.post("/api/image", (_q, s) => {
-  s.status(501).json({
-    error: "Image generation service এখনো যুক্ত করা হয়নি।"
+// Bengali Story
+app.post("/api/story", async (req, res) => {
+  try {
+    const prompt =
+      req.body.prompt ||
+      req.body.topic ||
+      req.body.message ||
+      "একটি সুন্দর বাংলা ভালোবাসার গল্প লেখো।";
+
+    const reply = await ai(
+      prompt,
+      "তুমি একজন অভিজ্ঞ বাংলা গল্পকার। আবেগপূর্ণ, রোমান্টিক ও ধারাবাহিক গল্প লেখো।"
+    );
+
+    res.json({ story: reply, reply });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// YouTube SEO
+app.post("/api/youtube-seo", async (req, res) => {
+  try {
+    const title = req.body.title || req.body.topic || req.body.prompt;
+
+    if (!title) {
+      return res.status(400).json({ error: "ভিডিওর Title দিন।" });
+    }
+
+    const reply = await ai(
+      `এই ভিডিওর জন্য সম্পূর্ণ YouTube SEO তৈরি করো: ${title}
+
+SEO Title, Description, Hashtags এবং Search Tags তৈরি করো।`,
+      "তুমি একজন Professional YouTube SEO Expert।"
+    );
+
+    res.json({ result: reply, seo: reply, reply });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Latest News RSS
+app.get("/api/news", async (req, res) => {
+  try {
+    const feeds = [
+      "https://feeds.bbci.co.uk/news/world/rss.xml",
+      "https://www.aljazeera.com/xml/rss/all.xml"
+    ];
+
+    const items = [];
+
+    for (const url of feeds) {
+      try {
+        const feed = await parser.parseURL(url);
+
+        feed.items.slice(0, 8).forEach(item => {
+          items.push({
+            title: item.title,
+            link: item.link,
+            date: item.isoDate || item.pubDate,
+            source: feed.title
+          });
+        });
+
+      } catch (error) {
+        console.log("RSS error:", error.message);
+      }
+    }
+
+    res.json({ items });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Web Search - needs a separate search API
+app.post("/api/search", (req, res) => {
+  res.status(501).json({
+    error: "লাইভ Web Search-এর জন্য আলাদা Search API সংযুক্ত করতে হবে।"
   });
 });
 
-// Live web search needs a separate search provider.
-app.post("/api/search", (_q, s) => {
-  s.status(501).json({
-    error: "Live web search provider এখনো যুক্ত করা হয়নি।"
+// Image Generation - separate image API required
+app.post("/api/image", (req, res) => {
+  res.status(501).json({
+    error: "Image Generation এখনো সংযুক্ত করা হয়নি।"
   });
 });
 
-app.use(express.static(process.cwd()));
-
-app.get("*", (_req, res) => {
-  res.sendFile(process.cwd() + "/index.html");
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log("SAGOR AI Gemini backend listening");
+app.listen(PORT, () => {
+  console.log(`SAGOR AI running on port ${PORT}`);
 });
