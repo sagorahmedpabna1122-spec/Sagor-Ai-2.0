@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#050b08">
+<title>SAGOR AI — YOUR AI. YOUR WORLD.</title>
+<style>
+:root{--bg:#050b08;--panel:#0a1711;--panel2:#0d2117;--line:#1b4932;--green:#43f0a1;--green2:#12a96a;--muted:#91b4a0;--white:#edfff4;--red:#ff6474}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--white);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+body{background:radial-gradient(ellipse at 50% -10%,#17462d 0,#09170f 34%,#030806 75%);min-height:100dvh}
+button,input,textarea{font:inherit}button{color:inherit;cursor:pointer}
+.app{max-width:900px;margin:auto;min-height:100dvh;padding-bottom:84px}
+.top{height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #173725;background:#06100ce8;backdrop-filter:blur(14px);position:sticky;top:0;z-index:9}
+.brand{font-weight:950;letter-spacing:2px;font-size:21px;color:var(--green);text-shadow:0 0 18px #31e99570}.brand small{display:block;font-size:8px;letter-spacing:3px;color:#a5cdb5;font-weight:600}
+.iconbtn{width:40px;height:40px;border:1px solid var(--line);border-radius:13px;background:#0b1c13;font-size:18px}
+.screen{display:none;padding:17px}.screen.active{display:block}
+.hero{text-align:center;padding:17px 0 10px}
+.orb{width:174px;height:174px;margin:0 auto 15px;border-radius:50%;display:grid;place-items:center;position:relative;background:radial-gradient(circle at 50% 45%,#174b32 0,#0c281a 45%,#06130c 70%);border:1px solid #4af5a4a0;box-shadow:0 0 20px #23e68a55,inset 0 0 35px #22d67b35;animation:breath 3.2s ease-in-out infinite}
+.orb:before,.orb:after{content:"";position:absolute;inset:-9px;border:1px solid #2ce78b70;border-radius:50%;transform:rotateX(65deg);animation:spin 9s linear infinite}
+.orb:after{inset:-17px;border-color:#2ce78b40;transform:rotateY(65deg);animation-direction:reverse}
+.brain{font-size:66px;filter:drop-shadow(0 0 13px #4affaa);z-index:1}
+@keyframes breath{50%{transform:scale(1.035);box-shadow:0 0 48px #23e68a70,inset 0 0 45px #22d67b55}}
+@keyframes spin{to{rotate:360deg}}
+.hello{font-size:21px;font-weight:800}.sub{font-size:12px;color:var(--muted);margin-top:5px}
+.status{display:inline-flex;gap:7px;align-items:center;margin-top:12px;padding:7px 12px;border:1px solid #20583b;border-radius:30px;background:#0a1c12;color:#a8e8c3;font-size:11px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green)}
+.sectionhead{display:flex;justify-content:space-between;align-items:center;margin:20px 1px 10px;font-weight:800;font-size:14px}.sectionhead span{color:var(--muted);font-size:11px;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.tile{min-height:72px;text-align:left;padding:12px;border-radius:15px;border:1px solid var(--line);background:linear-gradient(145deg,#10261a,#09140e);display:flex;align-items:center;gap:11px;box-shadow:0 5px 18px #0002}
+.tile:active,.action:active{transform:scale(.98);border-color:var(--green)}
+.tile .ico{font-size:23px}.tile b{font-size:13px;display:block}.tile small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.panel{border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#0d1d14,#07110b);padding:13px;margin-top:12px}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0;flex:1}
+.action{border:1px solid var(--line);border-radius:13px;padding:11px 12px;background:#10261a;font-size:13px}
+.primary{background:linear-gradient(120deg,#087c4a,#0c5937);border-color:#39e99b;font-weight:800}
+.danger{border-color:#71313b;background:#32151b;color:#ffb7bf}
+input,textarea{width:100%;background:#050e09;border:1px solid #244832;border-radius:13px;padding:12px;color:var(--white);outline:none;font-size:14px}
+textarea{resize:vertical;min-height:76px}
+input:focus,textarea:focus{border-color:var(--green)}
+.chatlog{height:min(46dvh,390px);overflow:auto;display:flex;flex-direction:column;gap:9px;padding:4px}
+.msg{max-width:91%;padding:11px 13px;border-radius:15px;font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.ai{align-self:flex-start;background:#10281b;border:1px solid #1d5738}.msg.me{align-self:flex-end;background:#075c3a;border:1px solid #168a57}
+.chatinput{display:flex;gap:7px;margin-top:9px}.chatinput textarea{min-height:48px;max-height:120px}.round{width:49px;flex:0 0 49px;border-radius:14px;border:1px solid #278052;background:#0d4a30;font-size:19px}
+.output{font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;max-height:45vh;overflow:auto}
+.item{padding:11px 0;border-bottom:1px solid #1a3828;font-size:13px}.item:last-child{border:0}.item a{color:#8ef4bb;text-decoration:none}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:10;background:#06100cf2;border-top:1px solid #1a3b29;backdrop-filter:blur(14px);padding:8px 4px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:center}
+.nav{width:min(900px,100%);display:flex;justify-content:space-around}.nav button{border:0;background:none;color:#88a994;font-size:10px;padding:5px 10px;min-width:54px}.nav button.active{color:var(--green)}.nav i{font-style:normal;font-size:19px;display:block;margin-bottom:2px}
+.mini{font-size:10px;color:#86a894;line-height:1.55}.hide{display:none!important}
+.toggle{display:flex;gap:9px;align-items:center;font-size:13px;color:#c4dfce}.toggle input{width:auto}
+footer{text-align:center;color:#547663;font-size:10px;padding:18px}
+@media(min-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{padding-top:27px}.orb{width:190px;height:190px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <button class="iconbtn" onclick="navigate('settings')" aria-label="Settings">☰</button>
+ <div class="brand">SAGOR AI<small>YOUR AI. YOUR WORLD.</small></div>
+ <button class="iconbtn" onclick="stopVoice()" aria-label="Stop voice">■</button>
+</header>
+
+<section class="screen active" id="home">
+ <div class="hero">
+  <div class="orb"><div class="brain">🧠</div></div>
+  <div class="hello">হ্যালো সাগর! 👋</div>
+  <div class="sub">তোমার নিজের বাংলা AI সহকারী</div>
+  <div class="status"><span class="dot"></span><span id="state">আমি প্রস্তুত, বলো কী করতে হবে</span></div>
+ </div>
+ <div class="sectionhead">QUICK ACCESS <span>তোমার ফোন ও AI সার্ভিস</span></div>
+ <div class="grid">
+  <button class="tile" onclick="launchApp('youtube')"><span class="ico">▶️</span><span><b>YouTube</b><small>অ্যাপ খুলুন</small></span></button>
+  <button class="tile" onclick="launchApp('facebook')"><span class="ico">📘</span><span><b>Facebook</b><small>অ্যাপ খুলুন</small></span></button>
+  <button class="tile" onclick="launchApp('playstore')"><span class="ico">🛍️</span><span><b>Play Store</b><small>অ্যাপ খুলুন</small></span></button>
+  <button class="tile" onclick="launchApp('whatsapp')"><span class="ico">💬</span><span><b>WhatsApp</b><small>অ্যাপ খুলুন</small></span></button>
+  <button class="tile" onclick="alarmFlow()"><span class="ico">⏰</span><span><b>অ্যালার্ম</b><small>সময় সেট করুন</small></span></button>
+  <button class="tile" onclick="navigate('news')"><span class="ico">📰</span><span><b>নিউজ</b><small>খবর খুঁজুন</small></span></button>
+ </div>
+ <div class="sectionhead">TODAY <span>দ্রুত তথ্য</span></div>
+ <div class="grid">
+  <button class="tile" onclick="weather()"><span class="ico">🌤️</span><span><b>আবহাওয়া</b><small>বর্তমান এলাকার খবর</small></span></button>
+  <button class="tile" onclick="navigate('create')"><span class="ico">✨</span><span><b>Creative Studio</b><small>গল্প, SEO, ছবি</small></span></button>
+  <button class="tile" onclick="navigate('chat')"><span class="ico">🧠</span><span><b>AI Chat</b><small>যেকোনো প্রশ্ন</small></span></button>
+ </div>
+ <div class="panel"><div class="sectionhead" style="margin-top:0">TODAY TASKS <span>তোমার কাজ</span></div><div class="mini" id="taskPreview">এখনো কোনো কাজ যোগ করা হয়নি। AI-কে রিমাইন্ডার তৈরি করতে বলো।</div></div>
+</section>
+
+<section class="screen" id="chat">
+ <div class="sectionhead">💬 SAGOR AI CHAT <span>বাংলায় কথা বলো</span></div>
+ <div class="panel">
+  <div class="chatlog" id="chatlog"><div class="msg ai">হ্যালো সাগর! 👋 আমি তোমার ব্যক্তিগত সহকারী। যেকোনো প্রশ্ন করো, গল্প চাইলে গল্প বলব, মন খারাপ হলে তোমার সঙ্গে কথা বলব।</div></div>
+  <div class="chatinput"><textarea id="message" placeholder="এখানে লিখো অথবা মাইক্রোফোনে বলো..." rows="2"></textarea><button class="round" onclick="listen()" title="Voice input">🎙️</button><button class="round primary" onclick="send()" title="Send">➤</button></div>
+  <div class="row" style="margin-top:8px"><button class="action" onclick="stopVoice()">⏹ থামাও</button><label class="toggle"><input type="checkbox" id="autoSpeak" checked> উত্তর পড়ে শোনাও</label></div>
+ </div>
+ <div class="mini" style="margin:10px 4px">AI উত্তর পেতে Settings-এ নিজের নিরাপদ Backend URL যুক্ত করতে হবে। API Key HTML-এ লিখবে না।</div>
+</section>
+
+<section class="screen" id="memory">
+ <div class="sectionhead">🧠 MEMORY <span>স্মৃতি ও নোট</span></div>
+ <div class="panel"><textarea id="memoryInput" placeholder="যে তথ্যটি এই ডিভাইসে মনে রাখতে চাও..."></textarea><button class="action primary" style="width:100%;margin-top:8px" onclick="saveMemory()">স্মৃতিতে রাখো</button><div id="memoryList" class="output" style="margin-top:12px"></div><p class="mini">এটি এই ডিভাইসের local memory; নিরাপদ cloud sync নয়। সংবেদনশীল তথ্য সংরক্ষণ কোরো না।</p></div>
+</section>
+
+<section class="screen" id="soul">
+ <div class="sectionhead">💚 SOUL <span>তোমার সঙ্গী</span></div>
+ <div class="grid">
+  <button class="tile" onclick="quickPrompt('আজ আমার মন খারাপ। আমার সঙ্গে একটু কথা বলো।')"><span class="ico">💚</span><span><b>মন খারাপ</b><small>আমার সঙ্গে কথা বলো</small></span></button>
+  <button class="tile" onclick="quickPrompt('আমাকে একটি সুন্দর রোমান্টিক বাংলা প্রেমের গল্প শোনাও।')"><span class="ico">🌹</span><span><b>প্রেমের গল্প</b><small>রোমান্টিক গল্প শোনাও</small></span></button>
+  <button class="tile" onclick="quickPrompt('আমাকে একটি মজার গল্প শোনাও।')"><span class="ico">😄</span><span><b>মজার গল্প</b><small>হাসির গল্প</small></span></button>
+  <button class="tile" onclick="quickPrompt('আমাকে অনুপ্রেরণামূলক কিছু কথা বলো।')"><span class="ico">🌟</span><span><b>অনুপ্রেরণা</b><small>ভালো কিছু কথা</small></span></button>
+ </div>
+ <div class="panel"><div class="mini">SAGOR AI তোমার কথা শুনবে ও কথোপকথন করবে। এটি মানুষের বিকল্প নয়, তবে সঙ্গ দিতে ও মন ভালো করার চেষ্টা করতে পারে।</div></div>
+</section>
+
+<section class="screen" id="news">
+ <div class="sectionhead">📰 NEWS & WEB SEARCH <span>বর্তমান ও পুরোনো খবর</span></div>
+ <div class="panel"><input id="newsQuery" placeholder="যেমন: ২০২৪ সালের বাংলাদেশের খবর"><div class="row" style="margin-top:8px"><button class="action primary" onclick="searchWeb()">খুঁজে দেখো</button><button class="action" onclick="headlines()">সর্বশেষ শিরোনাম</button></div><div id="newsOutput" class="output" style="margin-top:12px">খবর খুঁজতে সার্চ বক্সে বিষয় লিখো।</div></div>
+</section>
+
+<section class="screen" id="create">
+ <div class="sectionhead">✨ CREATIVE STUDIO <span>তৈরি করো</span></div>
+ <div class="panel"><b>বাংলা গল্প / স্ক্রিপ্ট</b><textarea id="storyPrompt" placeholder="কেমন গল্প লিখব?"></textarea><button class="action primary" style="width:100%;margin-top:8px" onclick="createText('story')">গল্প তৈরি করো</button><div id="storyOutput" class="output" style="margin-top:10px"></div></div>
+ <div class="panel"><b>YouTube SEO</b><textarea id="seoPrompt" placeholder="ভিডিওর নাম বা বিষয় লিখো..."></textarea><button class="action primary" style="width:100%;margin-top:8px" onclick="createText('seo')">SEO তৈরি করো</button><div id="seoOutput" class="output" style="margin-top:10px"></div></div>
+ <div class="panel"><b>AI Image Generation</b><textarea id="imagePrompt" placeholder="কেমন ছবি তৈরি করতে চাও?"></textarea><button class="action primary" style="width:100%;margin-top:8px" onclick="createImage()">ছবি তৈরি করো</button><div id="imageOutput" style="margin-top:10px"></div></div>
+</section>
+
+<section class="screen" id="settings">
+ <div class="sectionhead">⚙️ SETTINGS <span>সংযোগ ও অনুমতি</span></div>
+ <div class="panel"><b>Secure Backend URL</b><input id="backendUrl" placeholder="https://your-backend.example" style="margin-top:9px"><button class="action primary" style="width:100%;margin-top:8px" onclick="saveBackend()">সংরক্ষণ করো</button><div class="mini" id="backendStatus" style="margin-top:8px">AI, web search, news, story, SEO ও image API-এর জন্য Backend দরকার।</div></div>
+ <div class="panel"><b>ভয়েস সেটিংস</b><label class="toggle" style="margin-top:12px"><input type="checkbox" id="speakToggle" checked> AI-এর উত্তর পড়ে শোনাবে</label><button class="action" style="width:100%;margin-top:10px" onclick="testVoice()">বাংলা কণ্ঠ পরীক্ষা</button></div>
+ <div class="panel"><b>Android App Control</b><p class="mini">অ্যাপ খোলার কিছু deep link WebView-তে কাজ করতে পারে। অন্য অ্যাপের স্ক্রিন পড়া, স্ক্রল, বোতামে চাপ বা পূর্ণ ফোন নিয়ন্ত্রণের জন্য Native Android bridge ও ব্যবহারকারীর Accessibility অনুমতি লাগবে। HTML একা তা করতে পারে না।</p></div>
+ <div class="panel"><b>নিরাপত্তা</b><p class="mini">API Key কখনো এই HTML, APK বা browser storage-এ রাখবে না। Key শুধু HTTPS Backend-এর server-side secret হিসেবে রাখবে। টাকা খরচ, মেসেজ পাঠানো, পোস্ট/ডিলিট বা account change-এর আগে নিশ্চিতকরণ প্রয়োজন।</p></div>
+</section>
+<footer>SAGOR AI • তোমার নিজের বাংলা AI সহকারী</footer>
+</div>
+<div class="bottom"><nav class="nav">
+<button class="active" data-id="home" onclick="navigate('home')"><i>⌂</i>HOME</button>
+<button data-id="chat" onclick="navigate('chat')"><i>◉</i>CHAT</button>
+<button data-id="memory" onclick="navigate('memory')"><i>▣</i>MEMORY</button>
+<button data-id="soul" onclick="navigate('soul')"><i>♡</i>SOUL</button>
+<button data-id="settings" onclick="navigate('settings')"><i>⚙</i>SETTINGS</button>
+</nav></div>
+<script>
+const $=id=>document.getElementById(id);
+let backend=localStorage.getItem('sagor_backend_url')||'';
+$('backendUrl').value=backend;
+function setState(t){$('state').textContent=t}
+function navigate(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.id===id));window.scrollTo(0,0)}
+function addMessage(t,who='ai'){const d=document.createElement('div');d.className='msg '+who;d.textContent=t;$('chatlog').appendChild(d);$('chatlog').scrollTop=$('chatlog').scrollHeight}
+function speak(t){if(!$('autoSpeak').checked||!$('speakToggle').checked||!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='bn-BD';u.rate=1;speechSynthesis.speak(u)}
+function stopVoice(){if(window.speechSynthesis)speechSynthesis.cancel()}
+function listen(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){addMessage('এই WebView-তে speech recognition সমর্থিত নয়। ফোনের কিবোর্ডের মাইক্রোফোন ব্যবহার করো।');return}const r=new SR();r.lang='bn-BD';r.interimResults=false;r.onstart=()=>setState('তোমার কথা শুনছি...');r.onresult=e=>{$('message').value=e.results[0][0].transcript;send()};r.onerror=()=>setState('ভয়েস ইনপুট পাওয়া যায়নি');r.onend=()=>setState('আমি প্রস্তুত');r.start()}
+function saveBackend(){backend=$('backendUrl').value.trim().replace(/\/$/,'');localStorage.setItem('sagor_backend_url',backend);$('backendStatus').textContent=backend?'Backend URL সংরক্ষণ হয়েছে।':'Backend URL ফাঁকা আছে।'}
+async function request(path,body){if(!backend)throw Error('Settings-এ HTTPS Backend URL বসাও।');const res=await fetch(backend+path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined});let data={};try{data=await res.json()}catch{}if(!res.ok)throw Error(data.error||('Server error '+res.status));return data}
+async function send(){const q=$('message').value.trim();if(!q)return;$('message').value='';addMessage(q,'me');setState('উত্তর তৈরি করছি...');try{const d=await request('/api/chat',{message:q});const a=d.answer||'উত্তর পাওয়া যায়নি।';addMessage(a);speak(a)}catch(e){addMessage('আমি এখন AI সার্ভারে সংযোগ করতে পারছি না: '+e.message+'\\nBackend URL, API Key ও Internet সংযোগ পরীক্ষা করতে হবে।');}finally{setState('আমি প্রস্তুত')}}
+function quickPrompt(q){navigate('chat');$('message').value=q;send()}
+async function createText(type){const isStory=type==='story',field=isStory?'storyPrompt':'seoPrompt',out=isStory?'storyOutput':'seoOutput';const topic=$(field).value.trim();if(!topic)return;$(out).textContent='তৈরি হচ্ছে...';try{const d=await request(isStory?'/api/story':'/api/youtube-seo',{topic});$(out).textContent=d.story||d.result||'ফলাফল নেই।'}catch(e){$(out).textContent='সমস্যা: '+e.message}}
+async function createImage(){const prompt=$('imagePrompt').value.trim();if(!prompt)return;$('imageOutput').textContent='ছবি তৈরি হচ্ছে...';try{const d=await request('/api/image',{prompt});$('imageOutput').innerHTML='';if(d.image_base64){const im=document.createElement('img');im.src='data:image/png;base64,'+d.image_base64;im.style='width:100%;border-radius:14px';$('imageOutput').appendChild(im)}else $('imageOutput').textContent='ছবি পাওয়া যায়নি।'}catch(e){$('imageOutput').textContent='সমস্যা: '+e.message}}
+function launchApp(which){const schemes={youtube:'vnd.youtube://',facebook:'fb://',playstore:'market://',whatsapp:'whatsapp://'};const urls={youtube:'https://youtube.com',facebook:'https://facebook.com',playstore:'https://play.google.com/store',whatsapp:'https://whatsapp.com'};const start=Date.now();try{location.href=schemes[which];setTimeout(()=>{if(Date.now()-start<1800)location.href=urls[which]},700)}catch{location.href=urls[which]}}
+function alarmFlow(){const t=prompt('কত সময়ে অ্যালার্ম দিতে চাও? (২৪ ঘণ্টা, যেমন 07:30)');if(!t)return;const m=t.match(/^([01]?\d|2[0-3]):([0-5]\d)$/);if(!m){alert('সময় 07:30 এভাবে লিখো।');return}const h=Number(m[1]),min=Number(m[2]);const intent='intent:#Intent;action=android.intent.action.SET_ALARM;S.android.intent.extra.alarm.HOUR='+h+';S.android.intent.extra.alarm.MINUTES='+min+';S.android.intent.extra.alarm.MESSAGE=SAGOR%20AI;end';location.href=intent}
+async function weather(){navigate('home');setState('আবহাওয়া খুঁজছি');if(!navigator.geolocation){alert('এই WebView-তে Location নেই।');return}navigator.geolocation.getCurrentPosition(async p=>{try{const u=`https://api.open-meteo.com/v1/forecast?latitude=${p.coords.latitude}&longitude=${p.coords.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=auto`;const d=await(await fetch(u)).json(),c=d.current;const msg=`বর্তমান তাপমাত্রা ${c.temperature_2m}°C, অনুভূত ${c.apparent_temperature}°C, আর্দ্রতা ${c.relative_humidity_2m}%, বাতাস ${c.wind_speed_10m} কিমি/ঘণ্টা।`;alert(msg);speak(msg)}catch(e){alert('আবহাওয়া পাওয়া যায়নি: '+e.message)}finally{setState('আমি প্রস্তুত')}},()=>{alert('আবহাওয়ার জন্য Location permission দিতে হবে।');setState('আমি প্রস্তুত')})}
+async function headlines(){const out=$('newsOutput');out.textContent='শিরোনাম লোড হচ্ছে...';try{const d=await request('/api/news');out.innerHTML='';(d.items||[]).forEach(n=>{const el=document.createElement('div');el.className='item';const a=document.createElement('a');a.href=n.link;a.target='_blank';a.rel='noopener';a.textContent=n.title||'খবর';el.append(a);const small=document.createElement('div');small.className='mini';small.textContent=(n.source||'News')+' • '+(n.date||'');el.append(small);out.append(el)});if(!d.items?.length)out.textContent='কোনো শিরোনাম পাওয়া যায়নি।'}catch(e){out.textContent='সমস্যা: '+e.message}}
+async function searchWeb(){const q=$('newsQuery').value.trim();if(!q)return;$('newsOutput').textContent='ওয়েবে খুঁজছি...';try{const d=await request('/api/search',{query:q});$('newsOutput').textContent=d.answer||d.results||JSON.stringify(d,null,2)}catch(e){$('newsOutput').textContent='সমস্যা: '+e.message+'\\nলাইভ web search চালাতে Backend-এ Search provider/API configure করতে হবে।'}}
+function saveMemory(){const v=$('memoryInput').value.trim();if(!v)return;const arr=JSON.parse(localStorage.getItem('sagor_memories')||'[]');arr.unshift({text:v,date:new Date().toLocaleString('bn-BD')});localStorage.setItem('sagor_memories',JSON.stringify(arr.slice(0,50)));$('memoryInput').value='';renderMemory()}
+function renderMemory(){const arr=JSON.parse(localStorage.getItem('sagor_memories')||'[]');$('memoryList').textContent=arr.length?arr.map(x=>'• '+x.text+' ('+x.date+')').join('\\n'):'এখনো কোনো স্মৃতি নেই।'}
+function testVoice(){speak('হ্যালো সাগর। আমি তোমার SAGOR AI সহকারী।');}
+renderMemory();
+</script>
+</body></html>
